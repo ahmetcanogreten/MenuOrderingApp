@@ -1,0 +1,23 @@
+{
+    "lbl_add_menu": "Men\u00fc Ekle",
+    "lbl_menu_name": "Menu Ad\u0131",
+    "lbl_meal_name": "Yemek Ad\u0131",
+    "lbl_add_meal": "Yemek Ekle",
+    "lbl_remove_menu": "Men\u00fc Sil",
+    "lbl_remove_order": "Sipari\u015f Sil",
+    "lbl_order": "Sipari\u015f Ver",
+    "lbl_cannot_order": "Sipari\u015f Verilemedi",
+    "lbl_cannot_order_more": "Her g\u00fcn i\u00e7in tek bir sipari\u015f verebilirsin",
+    "lbl_logging_in": "Giri\u015f Yap\u0131l\u0131yor",
+    "lbl_email": "E-Posta",
+    "lbl_email_not_valid": "E-Posta ge\u00e7erli de\u011fil",
+    "lbl_password": "\u015eifre",
+    "lbl_password_not_valid": "\u015eifre ge\u00e7erli de\u011fil",
+    "lbl_confirm_password": "Do\u011frulama \u015eifresi",
+    "lbl_passwords_not_match": "\u015eifreler ayn\u0131 de\u011fil",
+    "lbl_register": "Kaydol",
+    "lbl_admin_page": "Y\u00f6netici",
+    "lbl_statistics_page": "\u0130statistik",
+    "lbl_dashboard_page": "Pano",
+    "lbl_calender_page": "Takvim"
+}

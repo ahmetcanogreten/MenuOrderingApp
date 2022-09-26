@@ -1,0 +1,23 @@
+{
+    "lbl_add_menu": "Add Menu",
+    "lbl_menu_name": "Menu Name",
+    "lbl_meal_name": "Meal Name",
+    "lbl_add_meal": "Add Meal",
+    "lbl_remove_menu": "Remove Menu",
+    "lbl_remove_order": "Remove Order",
+    "lbl_order": "Order",
+    "lbl_cannot_order": "Cannot Order",
+    "lbl_cannot_order_more": "You can only have a single  order for a day",
+    "lbl_logging_in": "Logging In",
+    "lbl_email": "E-Mail",
+    "lbl_email_not_valid": "E-Mail is not valid",
+    "lbl_password": "Password",
+    "lbl_password_not_valid": "Password is not valid",
+    "lbl_confirm_password": "Confirm Password",
+    "lbl_passwords_not_match": "Passwords do not match",
+    "lbl_register": "Register",
+    "lbl_admin_page": "Admin",
+    "lbl_statistics_page": "Statistics",
+    "lbl_dashboard_page": "Dashboard",
+    "lbl_calender_page": "Calender"
+}

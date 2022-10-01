@@ -8,8 +8,9 @@ import 'package:meal_ordering_app/features/menu/presentation/pages/home_page.dar
 import 'package:meal_ordering_app/features/menu/presentation/pages/calendar_page.dart';
 import 'package:meal_ordering_app/features/menu/presentation/widgets/dashboard_page.dart';
 import 'package:meal_ordering_app/features/menu/presentation/widgets/statistics_page.dart';
+import 'package:meal_ordering_app/router/route_guards/send_to_login_if_not_logged_in.dart';
 
-import 'features/authentication/presentation/pages/login_page.dart';
+import '../features/authentication/presentation/pages/login_page.dart';
 
 part 'app_router.gr.dart';
 
@@ -23,18 +24,29 @@ part 'app_router.gr.dart';
         AutoRoute(path: 'splash', page: SplashPage, initial: true),
         AutoRoute(path: 'login', page: LoginPage),
         AutoRoute(path: 'register', page: RegisterPage),
-        AutoRoute(path: 'home', page: HomePage, children: [
-          AutoRoute(path: 'admin', name: 'AdminRouter', page: AdminPage),
-          // AutoRoute(
-          //     path: 'statistics',
-          //     name: 'StatisticsRouter',
-          //     page: StatisticsPage),
-          AutoRoute(
-              path: 'dashboard', name: 'DashboardRouter', page: DashboardPage),
-          AutoRoute(path: 'future', name: 'FutureRouter', page: CalendarPage),
-        ]),
+        AutoRoute(
+            path: 'home',
+            guards: [SendToLoginIfNotLoggedIn],
+            page: HomePage,
+            children: [
+              AutoRoute(path: 'admin', name: 'AdminRouter', page: AdminPage),
+              // AutoRoute(
+              //     path: 'statistics',
+              //     name: 'StatisticsRouter',
+              //     page: StatisticsPage),
+              AutoRoute(
+                  path: 'dashboard',
+                  name: 'DashboardRouter',
+                  page: DashboardPage),
+              AutoRoute(
+                  path: 'future', name: 'FutureRouter', page: CalendarPage),
+            ]),
       ],
     ),
   ],
 )
-class AppRouter extends _$AppRouter {}
+class AppRouter extends _$AppRouter {
+  final SendToLoginIfNotLoggedIn checkIfLoggedIn;
+  AppRouter({required this.checkIfLoggedIn})
+      : super(checkIfLoggedIn: checkIfLoggedIn);
+}

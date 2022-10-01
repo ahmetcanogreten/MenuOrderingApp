@@ -7,11 +7,12 @@ import 'package:meal_ordering_app/features/menu/bloc/menu_bloc.dart';
 import 'package:meal_ordering_app/features/menu/bloc/orders_bloc.dart';
 import 'package:meal_ordering_app/features/menu/repositories/menu_repository.dart';
 import 'package:meal_ordering_app/features/menu/repositories/order_repository.dart';
+import 'package:meal_ordering_app/router/route_guards/send_to_login_if_not_logged_in.dart';
 import 'package:meal_ordering_app/theme.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:meal_ordering_app/app_router.dart';
+import 'package:meal_ordering_app/router/app_router.dart';
 
 const String kSupabaseUrl = 'https://uexepghfmujmghjizwid.supabase.co';
 const String kSupabaseToken =
@@ -27,14 +28,37 @@ Future<void> main() async {
     path: 'assets/translations',
     fallbackLocale: const Locale('en', 'US'),
     useOnlyLangCode: true,
-    child: MyApp(),
+    child: const MyApp(),
   ));
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  final _appRouter = AppRouter();
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AppRouter
+      _appRouter; // = AppRouter(checkIfLoggedIn: CheckIfLoggedIn());
+  final _authenticationBloc =
+      AuthenticationBloc(authenticationRepository: AuthenticationRepository())
+        ..add(AutoLogin());
+
+  @override
+  void initState() {
+    super.initState();
+    _appRouter = AppRouter(
+        checkIfLoggedIn:
+            SendToLoginIfNotLoggedIn(authenticationBloc: _authenticationBloc));
+  }
+
+  @override
+  void dispose() {
+    _authenticationBloc.close(); // TODO : Should I wait ?
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +66,7 @@ class MyApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return MultiBlocProvider(
           providers: [
-            BlocProvider<AuthenticationBloc>(
-              create: (context) => AuthenticationBloc(
-                  authenticationRepository: AuthenticationRepository())
-                ..add(AutoLogin()),
-            ),
+            BlocProvider.value(value: _authenticationBloc),
             BlocProvider(
                 create: (context) =>
                     MenuBloc(menuRepository: MenuRepository())),
@@ -54,16 +74,30 @@ class MyApp extends StatelessWidget {
                 create: (context) =>
                     OrdersBloc(orderRepository: OrderRepository())),
           ],
-          child: MaterialApp.router(
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            routerDelegate: _appRouter.delegate(),
-            routeInformationParser: _appRouter.defaultRouteParser(),
-            title: 'Flutter Demo',
-            theme: appLightTheme,
-            debugShowCheckedModeBanner: false,
-          ),
+          child: LayoutBuilder(builder: (context, constraints) {
+            return Container(
+              color: Colors.black,
+              child: Center(
+                child: SizedBox(
+                  width:
+                      constraints.maxWidth > 600 ? 600 : constraints.maxWidth,
+                  height: constraints.maxHeight > 1200
+                      ? 1200
+                      : constraints.maxHeight,
+                  child: MaterialApp.router(
+                    localizationsDelegates: context.localizationDelegates,
+                    supportedLocales: context.supportedLocales,
+                    locale: context.locale,
+                    routerDelegate: _appRouter.delegate(),
+                    routeInformationParser: _appRouter.defaultRouteParser(),
+                    title: 'Flutter Demo',
+                    theme: appLightTheme,
+                    debugShowCheckedModeBanner: false,
+                  ),
+                ),
+              ),
+            );
+          }),
         );
       },
     );

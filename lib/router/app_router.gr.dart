@@ -13,7 +13,12 @@
 part of 'app_router.dart';
 
 class _$AppRouter extends RootStackRouter {
-  _$AppRouter([GlobalKey<NavigatorState>? navigatorKey]) : super(navigatorKey);
+  _$AppRouter({
+    GlobalKey<NavigatorState>? navigatorKey,
+    required this.checkIfLoggedIn,
+  }) : super(navigatorKey);
+
+  final SendToLoginIfNotLoggedIn checkIfLoggedIn;
 
   @override
   final Map<String, PageFactory> pagesMap = {
@@ -99,6 +104,7 @@ class _$AppRouter extends RootStackRouter {
               HomeRoute.name,
               path: 'home',
               parent: EmptyRouterRoute.name,
+              guards: [checkIfLoggedIn],
               children: [
                 RouteConfig(
                   AdminRouter.name,

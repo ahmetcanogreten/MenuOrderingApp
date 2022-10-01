@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meal_ordering_app/app_router.dart';
+import 'package:meal_ordering_app/router/app_router.dart';
 import 'package:sizer/sizer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:auto_route/auto_route.dart';
 
 import 'package:meal_ordering_app/features/authentication/bloc/authentication_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -63,80 +62,97 @@ class _RegisterPageState extends State<RegisterPage> {
         } else if (state is LoggingInFailed) {
           // TODO : Fail
         } else if (state is LoggedIn) {
-          Navigator.of(context, rootNavigator: true).pop();
           context.router
               .pushAndPopUntil(const HomeRoute(), predicate: (_) => false);
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Form(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              key: _formKey,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: tr('lbl_email'),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) => isValidEmail(value ?? '')
-                          ? null
-                          : tr('lbl_email_not_valid'),
-                    ),
-                    SizedBox(height: 4.h),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: tr('lbl_password'),
-                      ),
-                      obscureText: true,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) => isValidPassword(value)
-                          ? null
-                          : tr('lbl_password_not_valid'),
-                    ),
-                    SizedBox(height: 2.h),
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: tr('lbl_confirm_password'),
-                      ),
-                      obscureText: true,
-                      textInputAction: TextInputAction.done,
-                      validator: (value) => isConfirmPasswordSame()
-                          ? null
-                          : tr('lbl_passwords_not_match'),
-                    ),
-                    SizedBox(height: 10.h),
-                    SizedBox(
-                        height: 8.h,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                BlocProvider.of<AuthenticationBloc>(context)
-                                    .add(
-                                  Register(
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                  ),
-                                );
-                              }
+        return LayoutBuilder(builder: (context, constraints) {
+          return Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: constraints.maxWidth > 600 ? 600 : constraints.maxWidth,
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Form(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    key: _formKey,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: tr('lbl_email'),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) => isValidEmail(value ?? '')
+                                ? null
+                                : tr('lbl_email_not_valid'),
+                          ),
+                          SizedBox(height: 4.w),
+                          TextFormField(
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: tr('lbl_password'),
+                            ),
+                            obscureText: true,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) => isValidPassword(value)
+                                ? null
+                                : tr('lbl_password_not_valid'),
+                          ),
+                          SizedBox(height: 2.w),
+                          TextFormField(
+                            controller: _confirmPasswordController,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: tr('lbl_confirm_password'),
+                            ),
+                            obscureText: true,
+                            textInputAction: TextInputAction.done,
+                            validator: (value) => isConfirmPasswordSame()
+                                ? null
+                                : tr('lbl_passwords_not_match'),
+                          ),
+                          const SizedBox(height: 16),
+                          GestureDetector(
+                            onTap: () {
+                              context.router.replace(const LoginRoute());
                             },
-                            child: Text(tr('lbl_register'))))
-                  ]),
+                            child: Text(tr('lbl_already_have_account'),
+                                textAlign: TextAlign.end,
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor)),
+                          ),
+                          SizedBox(height: 5.w),
+                          SizedBox(
+                              height: 5.w,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      BlocProvider.of<AuthenticationBloc>(
+                                              context)
+                                          .add(
+                                        Register(
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Text(tr('lbl_register'))))
+                        ]),
+                  ),
+                ),
+              ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }

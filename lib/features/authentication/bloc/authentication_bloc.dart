@@ -28,10 +28,38 @@ class AuthenticationBloc
       if (user != null) {
         final role =
             await _authenticationRepository.getUserRole(userId: user.id);
-        await Future.wait([
-          storage.write(key: 'email', value: email),
-          storage.write(key: 'password', value: password),
-        ]);
+
+        await storage.write(
+          key: 'token',
+          value: Supabase.instance.client.auth.currentSession
+              ?.refreshToken, // TODO : Remove Supabase
+        );
+
+        emit(LoggedIn(user: user, role: role));
+      } else {
+        emit(LoggingInFailed());
+      }
+    });
+
+    on<Login>((event, emit) async {
+      emit(WaitLoggingIn());
+
+      final email = event.email;
+      final password = event.password;
+
+      final user = await _authenticationRepository.signIn(
+          email: email, password: password);
+
+      if (user != null) {
+        final role =
+            await _authenticationRepository.getUserRole(userId: user.id);
+
+        await storage.write(
+          key: 'token',
+          value: Supabase.instance.client.auth.currentSession
+              ?.refreshToken, // TODO : Remove Supabase
+        );
+
         emit(LoggedIn(user: user, role: role));
       } else {
         emit(LoggingInFailed());
@@ -39,31 +67,24 @@ class AuthenticationBloc
     });
 
     on<AutoLogin>((event, emit) async {
-      final emailAndPasswordList = await Future.wait([
-        storage.read(key: 'email'),
-        storage.read(key: 'password'),
-      ]);
+      final token = await storage.read(key: 'token');
 
-      if (emailAndPasswordList.any((element) => element == null)) {
+      if (token == null) {
         emit(NotLoggedIn());
       } else {
-        final email = emailAndPasswordList[0]!;
-        final password = emailAndPasswordList[1]!;
-
-        final user = await _authenticationRepository.signIn(
-            email: email, password: password);
-
-        if (user != null) {
-          final role =
-              await _authenticationRepository.getUserRole(userId: user.id);
-          emit(LoggedIn(user: user, role: role)); // TODO :
-        } else {
-          await Future.wait([
-            storage.delete(key: 'email'),
-            storage.delete(key: 'password'),
-          ]);
+        final session = await Supabase.instance.client.auth
+            .setSession(token); // TODO : Remove Supabase
+        if (session.error != null) {
+          await storage.delete(key: 'token');
           emit(NotLoggedIn());
         }
+
+        await storage.write(key: 'token', value: session.data?.refreshToken);
+
+        final user = session.user!;
+        final role =
+            await _authenticationRepository.getUserRole(userId: user.id);
+        emit(LoggedIn(user: user, role: role)); // TODO :
       }
     });
   }
